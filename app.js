@@ -3,6 +3,8 @@ const apiUrl = "https://api.openweathermap.org/data/2.5/weather?units=metric&q="
 const searchBox = document.querySelector(".search input");
 const searchBtn = document.querySelector(".search button");
 const weatherIcon = document.querySelector(".weather-icon");
+const weatherContainer = document.querySelector(".weather");
+const defaultCity = "Narowal"; 
 
 async function checkWeather(city) {
     try {
@@ -16,11 +18,11 @@ async function checkWeather(city) {
         document.querySelector(".temp").innerHTML = Math.round(data.main.temp) + "°C";
         document.querySelector(".humidity").innerHTML = data.main.humidity + "%";
         document.querySelector(".wind").innerHTML = data.wind.speed + "km/h";
-        document.querySelector(".description").innerHTML = data.weather[0].description; // Added description
+        document.querySelector(".description").innerHTML = data.weather[0].description;
 
         console.log("Weather condition:", data.weather[0].main);
 
-        // Update weather icon based on weather condition
+       
         if (data.weather[0].main == "Clouds") {
             weatherIcon.src = "image/cloud.png";
         } else if (data.weather[0].main == "Rain") {
@@ -34,8 +36,14 @@ async function checkWeather(city) {
         } else if (data.weather[0].main == "Smoke") {
             weatherIcon.src = "image/smoke.png";
         } else {
-            weatherIcon.src = "image/default.png"; // Default icon for other weather conditions
+            weatherIcon.src = "image/default.png";
         }
+
+        
+        weatherContainer.style.display = "block";
+
+        
+        localStorage.setItem("city", city);
     } catch (error) {
         console.error(error);
         alert(error.message);
@@ -43,8 +51,19 @@ async function checkWeather(city) {
 }
 
 searchBtn.addEventListener("click", () => {
-    const city = searchBox.value;
-    if (city) {
-        checkWeather(city);
+    let city = searchBox.value.trim();
+    if (!city) {
+        city = defaultCity; 
+    }
+    checkWeather(city);
+});
+
+
+window.addEventListener("load", () => {
+    const storedCity = localStorage.getItem("city");
+    if (storedCity) {
+        checkWeather(storedCity);
+    } else {
+        checkWeather(defaultCity); 
     }
 });
